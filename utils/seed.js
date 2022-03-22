@@ -22,7 +22,9 @@ connection.once('open', async () => {
   // Loop 20 times -- add students to the students array
   for (let i = 0; i < 20; i++) {
     const fullName = getRandomName();
-    const email = `${first}${last}@aol.com`;
+    const firstName = fullName.split(' ')[0];
+    const lastName = fullName.split(' ')[1];
+    const email = `${firstName}${lastName}@aol.com`;
 
     users.push({
       username: fullName, 
