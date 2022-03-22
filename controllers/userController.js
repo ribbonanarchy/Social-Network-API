@@ -1,5 +1,16 @@
 const { User, Thought } = require('../models');
 
+const friendCount = async () =>
+  User.aggregate(
+    [
+      {
+        $count: "User"
+      }
+    ]
+  )
+    // Your code here
+    .then((numberOfFriends) => numberOfFriends);
+
 module.exports = {
     // Get all users
     getUsers(req, res) {
@@ -24,8 +35,7 @@ module.exports = {
           !user
             ? res.status(404).json({ message: 'No user with that ID' })
             : res.json({
-                user,
-                grade: await grade(req.params.studentId),
+                user
               })
         )
         .catch((err) => {
@@ -43,9 +53,9 @@ module.exports = {
     deleteUser(req, res) {
       User.findOneAndRemove({ _id: req.params.userId })
         .then((user) => {
-          if(!user) {
-            res.status(404).json({ message: 'No such user exists' });
-          }
+          !user
+          ? res.status(404).json({ message: 'No such user exists' })
+          : Thought.deleteMany({ _id: { $in: user.thoughts } })
         })
         .catch((err) => {
           console.log(err);
@@ -62,7 +72,7 @@ module.exports = {
         { $addToSet: { friends: req.body } },
         { runValidators: true, new: true }
       )
-        .then((user =>
+        .then((user) =>
           !user
             ? res
                 .status(404)
